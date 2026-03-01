@@ -198,23 +198,23 @@ RSpec.describe Flourish::Style do
 
     it "applies padding with 2 args (vertical, horizontal)" do
       style.padding(0, 2)
-      expect(style.send(:get_padding_top)).to eq(0)
-      expect(style.send(:get_padding_right)).to eq(2)
-      expect(style.send(:get_padding_bottom)).to eq(0)
-      expect(style.send(:get_padding_left)).to eq(2)
+      expect(style.send(:effective_padding_top)).to eq(0)
+      expect(style.send(:effective_padding_right)).to eq(2)
+      expect(style.send(:effective_padding_bottom)).to eq(0)
+      expect(style.send(:effective_padding_left)).to eq(2)
     end
 
     it "applies padding with 4 args" do
       style.padding(1, 2, 3, 4)
-      expect(style.send(:get_padding_top)).to eq(1)
-      expect(style.send(:get_padding_right)).to eq(2)
-      expect(style.send(:get_padding_bottom)).to eq(3)
-      expect(style.send(:get_padding_left)).to eq(4)
+      expect(style.send(:effective_padding_top)).to eq(1)
+      expect(style.send(:effective_padding_right)).to eq(2)
+      expect(style.send(:effective_padding_bottom)).to eq(3)
+      expect(style.send(:effective_padding_left)).to eq(4)
     end
 
     it "applies individual padding" do
       style.padding_left(3)
-      expect(style.send(:get_padding_left)).to eq(3)
+      expect(style.send(:effective_padding_left)).to eq(3)
     end
 
     it "adds left/right padding to content" do
@@ -232,24 +232,24 @@ RSpec.describe Flourish::Style do
   describe "margin" do
     it "applies uniform margin" do
       style.margin(1)
-      expect(style.send(:get_margin_top)).to eq(1)
-      expect(style.send(:get_margin_right)).to eq(1)
-      expect(style.send(:get_margin_bottom)).to eq(1)
-      expect(style.send(:get_margin_left)).to eq(1)
+      expect(style.send(:effective_margin_top)).to eq(1)
+      expect(style.send(:effective_margin_right)).to eq(1)
+      expect(style.send(:effective_margin_bottom)).to eq(1)
+      expect(style.send(:effective_margin_left)).to eq(1)
     end
 
     it "applies margin with 2 args" do
       style.margin(1, 2)
-      expect(style.send(:get_margin_top)).to eq(1)
-      expect(style.send(:get_margin_right)).to eq(2)
+      expect(style.send(:effective_margin_top)).to eq(1)
+      expect(style.send(:effective_margin_right)).to eq(2)
     end
 
     it "applies margin with 4 args" do
       style.margin(1, 2, 3, 4)
-      expect(style.send(:get_margin_top)).to eq(1)
-      expect(style.send(:get_margin_right)).to eq(2)
-      expect(style.send(:get_margin_bottom)).to eq(3)
-      expect(style.send(:get_margin_left)).to eq(4)
+      expect(style.send(:effective_margin_top)).to eq(1)
+      expect(style.send(:effective_margin_right)).to eq(2)
+      expect(style.send(:effective_margin_bottom)).to eq(3)
+      expect(style.send(:effective_margin_left)).to eq(4)
     end
 
     it "adds left/right margin" do
@@ -361,8 +361,8 @@ RSpec.describe Flourish::Style do
 
     it "sets align with 2 args" do
       style.align(0.5, 0.5)
-      expect(style.send(:get_align_horizontal)).to eq(0.5)
-      expect(style.send(:get_align_vertical)).to eq(0.5)
+      expect(style.send(:effective_align_horizontal)).to eq(0.5)
+      expect(style.send(:effective_align_vertical)).to eq(0.5)
     end
   end
 
@@ -508,20 +508,20 @@ RSpec.describe Flourish::Style do
   describe "padding CSS shorthand" do
     it "applies 3 args (top, horizontal, bottom)" do
       style.padding(1, 2, 3)
-      expect(style.send(:get_padding_top)).to eq(1)
-      expect(style.send(:get_padding_right)).to eq(2)
-      expect(style.send(:get_padding_bottom)).to eq(3)
-      expect(style.send(:get_padding_left)).to eq(2)
+      expect(style.send(:effective_padding_top)).to eq(1)
+      expect(style.send(:effective_padding_right)).to eq(2)
+      expect(style.send(:effective_padding_bottom)).to eq(3)
+      expect(style.send(:effective_padding_left)).to eq(2)
     end
   end
 
   describe "margin CSS shorthand" do
     it "applies 3 args (top, horizontal, bottom)" do
       style.margin(1, 2, 3)
-      expect(style.send(:get_margin_top)).to eq(1)
-      expect(style.send(:get_margin_right)).to eq(2)
-      expect(style.send(:get_margin_bottom)).to eq(3)
-      expect(style.send(:get_margin_left)).to eq(2)
+      expect(style.send(:effective_margin_top)).to eq(1)
+      expect(style.send(:effective_margin_right)).to eq(2)
+      expect(style.send(:effective_margin_bottom)).to eq(3)
+      expect(style.send(:effective_margin_left)).to eq(2)
     end
   end
 
@@ -703,21 +703,21 @@ RSpec.describe Flourish::Style do
       expect(s.reverse?).to be false
       expect(s.foreground_color).to be_nil
       expect(s.background_color).to be_nil
-      expect(s.send(:get_tab_width)).to eq(4)
+      expect(s.send(:effective_tab_width)).to eq(4)
       expect(s.inline?).to be false
-      expect(s.send(:get_width)).to eq(0)
-      expect(s.send(:get_height)).to eq(0)
-      expect(s.send(:get_max_width)).to eq(0)
-      expect(s.send(:get_max_height)).to eq(0)
-      expect(s.send(:get_padding_top)).to eq(0)
-      expect(s.send(:get_padding_right)).to eq(0)
-      expect(s.send(:get_padding_bottom)).to eq(0)
-      expect(s.send(:get_padding_left)).to eq(0)
-      expect(s.send(:get_margin_top)).to eq(0)
-      expect(s.send(:get_margin_right)).to eq(0)
-      expect(s.send(:get_margin_bottom)).to eq(0)
-      expect(s.send(:get_margin_left)).to eq(0)
-      expect(s.send(:get_border_style)).to be_nil
+      expect(s.send(:effective_width)).to eq(0)
+      expect(s.send(:effective_height)).to eq(0)
+      expect(s.send(:effective_max_width)).to eq(0)
+      expect(s.send(:effective_max_height)).to eq(0)
+      expect(s.send(:effective_padding_top)).to eq(0)
+      expect(s.send(:effective_padding_right)).to eq(0)
+      expect(s.send(:effective_padding_bottom)).to eq(0)
+      expect(s.send(:effective_padding_left)).to eq(0)
+      expect(s.send(:effective_margin_top)).to eq(0)
+      expect(s.send(:effective_margin_right)).to eq(0)
+      expect(s.send(:effective_margin_bottom)).to eq(0)
+      expect(s.send(:effective_margin_left)).to eq(0)
+      expect(s.send(:effective_border_style)).to be_nil
       expect(s.border_top?).to be false
       expect(s.border_right?).to be false
       expect(s.border_bottom?).to be false

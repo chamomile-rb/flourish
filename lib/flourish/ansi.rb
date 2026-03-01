@@ -31,6 +31,47 @@ module Flourish
         [w, lines.length]
       end
 
+      def extract_escape(chars, start)
+        return nil unless chars[start] == "\e"
+
+        i = start + 1
+        return nil if i >= chars.length
+
+        if chars[i] == "["
+          seq = +"\e["
+          i += 1
+          while i < chars.length && chars[i].match?(/[0-9;]/)
+            seq << chars[i]
+            i += 1
+          end
+          if i < chars.length && chars[i].match?(/[A-Za-z]/)
+            seq << chars[i]
+            return seq
+          end
+        end
+
+        nil
+      end
+
+      def track_sgr(active_sgr, seq)
+        if ["\e[0m", "\e[m"].include?(seq)
+          active_sgr.clear
+        elsif seq.match?(/\A\e\[\d/)
+          if active_sgr.empty?
+            active_sgr.replace(seq)
+          else
+            active_sgr.replace("#{active_sgr.delete_suffix("\e[0m")}#{seq}")
+          end
+        end
+      end
+
+      def sgr_open_after?(was_open, seq)
+        return false if ["\e[0m", "\e[m"].include?(seq)
+        return true if seq.match?(/\A\e\[\d/)
+
+        was_open
+      end
+
       private
 
       def char_width(ch)

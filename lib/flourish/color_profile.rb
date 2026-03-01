@@ -91,11 +91,11 @@ module Flourish
       def truecolor_to_256(color)
         # Check grayscale ramp first (232-255)
         if color.r == color.g && color.g == color.b
-          return Color::ANSI256Color.new(16) if color.r < 8
-          return Color::ANSI256Color.new(231) if color.r > 248
+          return Color::ANSI256Color.new(code: 16) if color.r < 8
+          return Color::ANSI256Color.new(code: 231) if color.r > 248
 
           gray_idx = ((color.r.to_f - 8) / 247 * 24).round
-          return Color::ANSI256Color.new(232 + gray_idx)
+          return Color::ANSI256Color.new(code: 232 + gray_idx)
         end
 
         # Map to 6x6x6 color cube (indices 16-231)
@@ -117,15 +117,15 @@ module Flourish
         gray_dist = color_distance(color.r, color.g, color.b, gray_val, gray_val, gray_val)
 
         if gray_dist < cube_dist
-          Color::ANSI256Color.new(232 + gray_idx)
+          Color::ANSI256Color.new(code: 232 + gray_idx)
         else
-          Color::ANSI256Color.new(cube_idx)
+          Color::ANSI256Color.new(code: cube_idx)
         end
       end
 
       def ansi256_to_ansi(color)
         idx = color.code.clamp(0, 255)
-        Color::ANSIColor.new(ANSI256_TO_ANSI[idx])
+        Color::ANSIColor.new(code: ANSI256_TO_ANSI[idx])
       end
 
       def color_distance(r1, g1, b1, r2, g2, b2)

@@ -20,23 +20,23 @@ class LayoutDemo
   PANELS = %i[status files branches commits stash main].freeze
 
   PANEL_TITLES = {
-    status:   "Status",
-    files:    "Files",
+    status: "Status",
+    files: "Files",
     branches: "Branches",
-    commits:  "Commits",
-    stash:    "Stash",
-    main:     "Main"
+    commits: "Commits",
+    stash: "Stash",
+    main: "Main",
   }.freeze
 
   PANEL_DATA = {
-    status:   ["On branch: main", "Up to date with origin/main", "", "nothing to commit"],
-    files:    ["M lib/flourish/style.rb", "M lib/flourish/wrap.rb", "A examples/kitchen_sink.rb",
-               "M spec/flourish/style_spec.rb", "? tmp/debug.log"],
+    status: ["On branch: main", "Up to date with origin/main", "", "nothing to commit"],
+    files: ["M lib/flourish/style.rb", "M lib/flourish/wrap.rb", "A examples/kitchen_sink.rb",
+            "M spec/flourish/style_spec.rb", "? tmp/debug.log",],
     branches: ["* main", "  feature/layout", "  feature/colors", "  fix/border-bug", "  dev"],
-    commits:  ["abc1234 Fix border rendering bug", "def5678 Add ANSI-aware word wrap",
-               "789abcd Refactor style pipeline", "012efab Add color downsampling",
-               "345cdef Initial Flourish commit"],
-    stash:    ["stash@{0}: WIP on main: half-done refactor"]
+    commits: ["abc1234 Fix border rendering bug", "def5678 Add ANSI-aware word wrap",
+              "789abcd Refactor style pipeline", "012efab Add color downsampling",
+              "345cdef Initial Flourish commit",],
+    stash: ["stash@{0}: WIP on main: half-done refactor"],
   }.freeze
 
   FOCUSED_COLOR   = "#7d56f4"
@@ -73,9 +73,7 @@ class LayoutDemo
       when "j", :down
         panel = PANELS[@focused]
         items = PANEL_DATA[panel]
-        if items
-          @cursor[panel] = [(@cursor[panel] + 1), items.size - 1].min
-        end
+        @cursor[panel] = [(@cursor[panel] + 1), items.size - 1].min if items
       when "k", :up
         panel = PANELS[@focused]
         @cursor[panel] = [(@cursor[panel] - 1), 0].max if PANEL_DATA[panel]
@@ -102,13 +100,13 @@ class LayoutDemo
 
   private
 
-  def render_left_column(w, total_h)
+  def render_left_column(col_width, total_h)
     count = LEFT_PANELS.size
     # Distribute height: each panel gets base_h, remainder goes to first panels
     inner_heights = distribute_heights(total_h, count)
 
     panels = LEFT_PANELS.each_with_index.map do |key, i|
-      render_panel(key, w, inner_heights[i])
+      render_panel(key, col_width, inner_heights[i])
     end
 
     Flourish.join_vertical(Flourish::LEFT, *panels)
@@ -122,16 +120,16 @@ class LayoutDemo
     Array.new(count) { |i| i < extra ? base + 1 : base }
   end
 
-  def render_panel(key, w, h)
+  def render_panel(key, panel_width, panel_height)
     focused = PANELS[@focused] == key
     color   = focused ? FOCUSED_COLOR : UNFOCUSED_COLOR
 
     if key == :main
-      content = render_detail(w - 2, h - 2)
+      content = render_detail(panel_width - 2, panel_height - 2)
     else
       items   = PANEL_DATA[key] || []
       cursor  = @cursor[key]
-      inner_w = w - 2 # border takes 2 columns
+      inner_w = panel_width - 2 # border takes 2 columns
 
       lines = items.each_with_index.map do |item, i|
         text = truncate(item, inner_w)
@@ -145,31 +143,31 @@ class LayoutDemo
     end
 
     rendered = Flourish::Style.new
-                .border(Flourish::Border::ROUNDED)
-                .border_foreground(color)
-                .width(w)
-                .height(h)
-                .render(content)
+                              .border(Flourish::Border::ROUNDED)
+                              .border_foreground(color)
+                              .width(panel_width)
+                              .height(panel_height)
+                              .render(content)
 
     inject_title(rendered, PANEL_TITLES[key], focused ? FOCUSED_COLOR : DIM)
   end
 
-  def render_detail(w, h)
+  def render_detail(detail_width, detail_height)
     panel = PANELS[@focused]
     items = PANEL_DATA[panel]
 
     header_text, body_lines = if items.nil?
                                 ["Main Panel", ["Select an item from a left panel", "to see details here."]]
                               else
-                                detail_for(panel, @cursor[panel], w)
+                                detail_for(panel, @cursor[panel], detail_width)
                               end
 
     header = "\e[1m\e[38;2;4;181;117m#{header_text}\e[0m"
     lines  = [header, ""] + body_lines
-    lines.map { |l| truncate(l, w) }.take([h, lines.size].min).join("\n")
+    lines.map { |l| truncate(l, detail_width) }.take([detail_height, lines.size].min).join("\n")
   end
 
-  def detail_for(panel, cursor, w)
+  def detail_for(panel, cursor, _detail_width)
     items = PANEL_DATA[panel]
     item  = items[cursor] || items[0]
 
@@ -191,8 +189,8 @@ class LayoutDemo
         "Date:   2 days ago",
         "",
         "Tracking: origin/#{branch}",
-        branch == "main" ? "Status: up to date" : "Status: 3 commits ahead"
-      ]]
+        branch == "main" ? "Status: up to date" : "Status: 3 commits ahead",
+      ],]
     when :commits
       sha  = item[0, 7]
       desc = item[8..]
@@ -202,8 +200,8 @@ class LayoutDemo
         "",
         "    #{desc}",
         "",
-        *fake_diff_stats
-      ]]
+        *fake_diff_stats,
+      ],]
     when :stash
       ["Stash Details", [
         item,
@@ -211,8 +209,8 @@ class LayoutDemo
         "Created: 1 hour ago",
         "Branch: main",
         "",
-        *fake_diff_stats
-      ]]
+        *fake_diff_stats,
+      ],]
     else
       [item.to_s, []]
     end
@@ -248,7 +246,7 @@ class LayoutDemo
       "#{green}+12#{reset} #{red}-4#{reset} lib/flourish/style.rb",
       "#{green} +3#{reset} #{red}-1#{reset} lib/flourish/wrap.rb",
       "",
-      "2 files changed, 15 insertions(+), 5 deletions(-)"
+      "2 files changed, 15 insertions(+), 5 deletions(-)",
     ]
   end
 
@@ -261,61 +259,54 @@ class LayoutDemo
     styled = "\e[1m\e[38;2;#{r};#{g};#{b}m#{title_str}\e[0m"
 
     top = lines[0]
-    # Find position after the top-left corner (2nd character)
-    # We need to replace visible characters in the border
-    # The top line is: ╭──...──╮ (with possible ANSI color codes)
-    # Insert title after the first border segment
     stripped = Flourish::ANSI.strip(top)
-    if stripped.length >= title_str.length + 3
-      # Find the border char color prefix (the ANSI codes wrapping the border)
-      # Replace visible chars 2..(2+title_len-1) with the styled title
-      visible_idx = 0
-      byte_start = nil
-      byte_end = nil
-      i = 0
-      while i < top.length
-        if top[i] == "\e"
-          # Skip ANSI sequence
-          j = i + 1
-          j += 1 while j < top.length && top[j] != "m"
-          i = j + 1
-        else
-          char_len = top[i].bytesize rescue 1
-          if visible_idx == 2
-            byte_start = i
-          end
-          if visible_idx == 2 + title_str.length
-            byte_end = i
-            break
-          end
-          visible_idx += 1
-          i += top[i].valid_encoding? ? top[i].length : 1
-        end
-      end
-
-      if byte_start && byte_end
-        lines[0] = top[0...byte_start] + styled + top[byte_end..]
-      elsif byte_start
-        lines[0] = top[0...byte_start] + styled
-      end
-    end
+    lines[0] = splice_title_into_border(top, stripped, title_str, styled) if stripped.length >= title_str.length + 3
 
     lines.join("\n")
   end
 
+  def splice_title_into_border(top, _stripped, title_str, styled)
+    # Replace visible chars 2..(2+title_len-1) with the styled title
+    visible_idx = 0
+    byte_start = nil
+    byte_end = nil
+    i = 0
+    while i < top.length
+      if top[i] == "\e"
+        j = i + 1
+        j += 1 while j < top.length && top[j] != "m"
+        i = j + 1
+      else
+        byte_start = i if visible_idx == 2
+        if visible_idx == 2 + title_str.length
+          byte_end = i
+          break
+        end
+        visible_idx += 1
+        i += top[i].valid_encoding? ? top[i].length : 1
+      end
+    end
+
+    if byte_start && byte_end
+      top[0...byte_start] + styled + top[byte_end..]
+    elsif byte_start
+      top[0...byte_start] + styled
+    else
+      top
+    end
+  end
+
   def hex_to_rgb(hex)
     hex = hex.delete("#")
-    if hex.length == 3
-      hex = hex.chars.map { |c| c * 2 }.join
-    end
+    hex = hex.chars.map { |c| c * 2 }.join if hex.length == 3
     [hex[0, 2].to_i(16), hex[2, 2].to_i(16), hex[4, 2].to_i(16)]
   end
 
-  def status_bar(w)
+  def status_bar(bar_width)
     Flourish::Style.new
-      .foreground(DIM)
-      .width(w)
-      .render(" Tab/Shift+Tab navigate \u2502 j/k scroll \u2502 q quit")
+                   .foreground(DIM)
+                   .width(bar_width)
+                   .render(" Tab/Shift+Tab navigate \u2502 j/k scroll \u2502 q quit")
   end
 
   def truncate(str, max_w)
@@ -330,19 +321,18 @@ class LayoutDemo
         i = j + 1
       else
         visible += 1
-        if visible > max_w
-          return str[0...i]
-        end
+        return str[0...i] if visible > max_w
+
         i += 1
       end
     end
     str
   end
 
-  def pad_right(str, w)
+  def pad_right(str, target_width)
     visible_len = Flourish::ANSI.printable_width(str)
-    if visible_len < w
-      str + (" " * (w - visible_len))
+    if visible_len < target_width
+      str + (" " * (target_width - visible_len))
     else
       str
     end

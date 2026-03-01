@@ -62,10 +62,6 @@ module Flourish
       middle_left: "+", middle_right: "+", middle: "+", middle_top: "+", middle_bottom: "+"
     ).freeze
 
-    MARKDOWN = BorderDef.new(
-      top: "-", bottom: "-", left: "|", right: "|",
-      top_left: "+", top_right: "+", bottom_left: "+", bottom_right: "+",
-      middle_left: "+", middle_right: "+", middle: "+", middle_top: "+", middle_bottom: "+"
-    ).freeze
+    MARKDOWN = ASCII
   end
 end

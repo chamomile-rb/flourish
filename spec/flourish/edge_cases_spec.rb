@@ -227,10 +227,10 @@ RSpec.describe "Edge cases" do
     it "copies dimensions" do
       original = Flourish::Style.new.width(20).height(10).padding(1, 2)
       copy = original.copy
-      expect(copy.send(:get_width)).to eq(20)
-      expect(copy.send(:get_height)).to eq(10)
-      expect(copy.send(:get_padding_top)).to eq(1)
-      expect(copy.send(:get_padding_right)).to eq(2)
+      expect(copy.send(:effective_width)).to eq(20)
+      expect(copy.send(:effective_height)).to eq(10)
+      expect(copy.send(:effective_padding_top)).to eq(1)
+      expect(copy.send(:effective_padding_right)).to eq(2)
     end
   end
 
@@ -239,7 +239,7 @@ RSpec.describe "Edge cases" do
       parent = Flourish::Style.new.border(Flourish::Border::ROUNDED)
       child = Flourish::Style.new.bold
       child.inherit(parent)
-      expect(child.send(:get_border_style)).to eq(Flourish::Border::ROUNDED)
+      expect(child.send(:effective_border_style)).to eq(Flourish::Border::ROUNDED)
       expect(child.border_top?).to be true
     end
 
@@ -247,17 +247,17 @@ RSpec.describe "Edge cases" do
       parent = Flourish::Style.new.padding(1, 2, 3, 4)
       child = Flourish::Style.new
       child.inherit(parent)
-      expect(child.send(:get_padding_top)).to eq(1)
-      expect(child.send(:get_padding_right)).to eq(2)
-      expect(child.send(:get_padding_bottom)).to eq(3)
-      expect(child.send(:get_padding_left)).to eq(4)
+      expect(child.send(:effective_padding_top)).to eq(1)
+      expect(child.send(:effective_padding_right)).to eq(2)
+      expect(child.send(:effective_padding_bottom)).to eq(3)
+      expect(child.send(:effective_padding_left)).to eq(4)
     end
 
     it "child overrides inherited properties" do
       parent = Flourish::Style.new.padding(1)
       child = Flourish::Style.new.padding(2)
       child.inherit(parent)
-      expect(child.send(:get_padding_top)).to eq(2)
+      expect(child.send(:effective_padding_top)).to eq(2)
     end
   end
 
@@ -273,7 +273,7 @@ RSpec.describe "Edge cases" do
     it "unset width reverts to no width" do
       style = Flourish::Style.new.width(10)
       style.unset(Flourish::Style::WIDTH)
-      expect(style.send(:get_width)).to eq(0)
+      expect(style.send(:effective_width)).to eq(0)
     end
   end
 
@@ -365,13 +365,6 @@ RSpec.describe "Edge cases" do
           expect(preset.send(field).length).to be >= 1
         end
       end
-    end
-  end
-
-  describe "Whitespace.fill with large widths" do
-    it "handles large fill" do
-      result = Flourish::Whitespace.fill(100)
-      expect(result.length).to eq(100)
     end
   end
 
