@@ -238,42 +238,42 @@ RSpec.describe "Edge cases" do
     it "inherits border style" do
       parent = Flourish::Style.new.border(Flourish::Border::ROUNDED)
       child = Flourish::Style.new.bold
-      child.inherit(parent)
-      expect(child.send(:effective_border_style)).to eq(Flourish::Border::ROUNDED)
-      expect(child.border_top?).to be true
+      result = child.inherit(parent)
+      expect(result.send(:effective_border_style)).to eq(Flourish::Border::ROUNDED)
+      expect(result.border_top?).to be true
     end
 
     it "inherits padding" do
       parent = Flourish::Style.new.padding(1, 2, 3, 4)
       child = Flourish::Style.new
-      child.inherit(parent)
-      expect(child.send(:effective_padding_top)).to eq(1)
-      expect(child.send(:effective_padding_right)).to eq(2)
-      expect(child.send(:effective_padding_bottom)).to eq(3)
-      expect(child.send(:effective_padding_left)).to eq(4)
+      result = child.inherit(parent)
+      expect(result.send(:effective_padding_top)).to eq(1)
+      expect(result.send(:effective_padding_right)).to eq(2)
+      expect(result.send(:effective_padding_bottom)).to eq(3)
+      expect(result.send(:effective_padding_left)).to eq(4)
     end
 
     it "child overrides inherited properties" do
       parent = Flourish::Style.new.padding(1)
       child = Flourish::Style.new.padding(2)
-      child.inherit(parent)
-      expect(child.send(:effective_padding_top)).to eq(2)
+      result = child.inherit(parent)
+      expect(result.send(:effective_padding_top)).to eq(2)
     end
   end
 
   describe "Style unset restores defaults" do
     it "unset foreground reverts to no color" do
       style = Flourish::Style.new.foreground("1")
-      style.unset(Flourish::Style::FOREGROUND)
-      expect(style.foreground_color).to be_nil
-      result = style.render("hi")
+      s2 = style.unset(Flourish::Style::FOREGROUND)
+      expect(s2.foreground_color).to be_nil
+      result = s2.render("hi")
       expect(result).to eq("hi")
     end
 
     it "unset width reverts to no width" do
       style = Flourish::Style.new.width(10)
-      style.unset(Flourish::Style::WIDTH)
-      expect(style.send(:effective_width)).to eq(0)
+      s2 = style.unset(Flourish::Style::WIDTH)
+      expect(s2.send(:effective_width)).to eq(0)
     end
   end
 
@@ -423,15 +423,15 @@ RSpec.describe "Edge cases" do
     it "can disable bold" do
       style = Flourish::Style.new.bold(true)
       expect(style.bold?).to be true
-      style.bold(false)
-      expect(style.bold?).to be false
+      s2 = style.bold(false)
+      expect(s2.bold?).to be false
     end
 
     it "can disable border sides" do
       style = Flourish::Style.new.border(Flourish::Border::ASCII)
       expect(style.border_top?).to be true
-      style.border_top(false)
-      expect(style.border_top?).to be false
+      s2 = style.border_top(false)
+      expect(s2.border_top?).to be false
     end
   end
 end

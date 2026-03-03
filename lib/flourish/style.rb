@@ -97,11 +97,12 @@ module Flourish
 
     def padding(*args)
       top, right, bottom, left = expand_shorthand(args)
-      assign_prop(:padding_top, top)
-      assign_prop(:padding_right, right)
-      assign_prop(:padding_bottom, bottom)
-      assign_prop(:padding_left, left)
-      self
+      copy = dup
+      copy.set_prop!(:padding_top, top)
+      copy.set_prop!(:padding_right, right)
+      copy.set_prop!(:padding_bottom, bottom)
+      copy.set_prop!(:padding_left, left)
+      copy
     end
 
     def padding_top(n) = assign_prop(:padding_top, n)
@@ -113,11 +114,12 @@ module Flourish
 
     def margin(*args)
       top, right, bottom, left = expand_shorthand(args)
-      assign_prop(:margin_top, top)
-      assign_prop(:margin_right, right)
-      assign_prop(:margin_bottom, bottom)
-      assign_prop(:margin_left, left)
-      self
+      copy = dup
+      copy.set_prop!(:margin_top, top)
+      copy.set_prop!(:margin_right, right)
+      copy.set_prop!(:margin_bottom, bottom)
+      copy.set_prop!(:margin_left, left)
+      copy
     end
 
     def margin_top(n) = assign_prop(:margin_top, n)
@@ -128,9 +130,10 @@ module Flourish
     # --- Border ---
 
     def border(style, *sides)
-      assign_prop(:border_style, style)
-      apply_border_sides(sides)
-      self
+      copy = dup
+      copy.set_prop!(:border_style, style)
+      copy.send(:apply_border_sides, sides)
+      copy
     end
 
     def border_style(style)
@@ -143,13 +146,15 @@ module Flourish
     def border_left(v = true) = assign_prop(:border_left, v)
 
     def border_foreground(*colors)
-      apply_border_colors(colors, :fg)
-      self
+      copy = dup
+      copy.send(:apply_border_colors, colors, :fg)
+      copy
     end
 
     def border_background(*colors)
-      apply_border_colors(colors, :bg)
-      self
+      copy = dup
+      copy.send(:apply_border_colors, colors, :bg)
+      copy
     end
 
     def border_top_foreground(color) = assign_prop(:border_top_fg, Color.parse(color))
@@ -164,9 +169,10 @@ module Flourish
     # --- Alignment ---
 
     def align(*positions)
-      assign_prop(:align_horizontal, positions[0]) if positions.length >= 1
-      assign_prop(:align_vertical, positions[1]) if positions.length >= 2
-      self
+      copy = dup
+      copy.set_prop!(:align_horizontal, positions[0]) if positions.length >= 1
+      copy.set_prop!(:align_vertical, positions[1]) if positions.length >= 2
+      copy
     end
 
     def align_horizontal(pos) = assign_prop(:align_horizontal, pos)
@@ -201,21 +207,23 @@ module Flourish
     # --- Inheritance ---
 
     def inherit(other)
+      copy = dup
       other.set_props.each do |prop|
-        next if @set_props.include?(prop)
+        next if copy.set_props.include?(prop)
 
-        instance_variable_set(:"@#{prop}", other.instance_variable_get(:"@#{prop}"))
-        @set_props.add(prop)
+        copy.instance_variable_set(:"@#{prop}", other.instance_variable_get(:"@#{prop}"))
+        copy.set_props.add(prop)
       end
-      self
+      copy
     end
 
     def unset(*props)
+      copy = dup
       props.each do |prop|
-        @set_props.delete(prop)
-        instance_variable_set(:"@#{prop}", nil)
+        copy.set_props.delete(prop)
+        copy.instance_variable_set(:"@#{prop}", nil)
       end
-      self
+      copy
     end
 
     def set?(prop)
@@ -282,6 +290,12 @@ module Flourish
     # Accessible from other Style instances for inheritance
     attr_reader :set_props
 
+    # Mutate a prop in place — used by multi-prop methods after dup
+    def set_prop!(prop, value)
+      instance_variable_set(:"@#{prop}", value)
+      @set_props.add(prop)
+    end
+
     def initialize_dup(other)
       super
       @set_props = @set_props.dup
@@ -289,12 +303,13 @@ module Flourish
 
     private
 
-    # --- Property assignment ---
+    # --- Property assignment (immutable: returns a new Style) ---
 
     def assign_prop(prop, value)
-      instance_variable_set(:"@#{prop}", value)
-      @set_props.add(prop)
-      self
+      copy = dup
+      copy.instance_variable_set(:"@#{prop}", value)
+      copy.set_props.add(prop)
+      copy
     end
 
     # --- CSS shorthand expansion ---
@@ -569,20 +584,20 @@ module Flourish
 
     def apply_border_sides(sides)
       values = sides.empty? ? [true, true, true, true] : expand_shorthand(sides)
-      assign_prop(:border_top, values[0])
-      assign_prop(:border_right, values[1])
-      assign_prop(:border_bottom, values[2])
-      assign_prop(:border_left, values[3])
+      set_prop!(:border_top, values[0])
+      set_prop!(:border_right, values[1])
+      set_prop!(:border_bottom, values[2])
+      set_prop!(:border_left, values[3])
     end
 
     def apply_border_colors(colors, type)
       suffix = type == :fg ? "_fg" : "_bg"
       parsed = colors.map { |c| Color.parse(c) }
       top, right, bottom, left = expand_shorthand(parsed)
-      assign_prop(:"border_top#{suffix}", top)
-      assign_prop(:"border_right#{suffix}", right)
-      assign_prop(:"border_bottom#{suffix}", bottom)
-      assign_prop(:"border_left#{suffix}", left)
+      set_prop!(:"border_top#{suffix}", top)
+      set_prop!(:"border_right#{suffix}", right)
+      set_prop!(:"border_bottom#{suffix}", bottom)
+      set_prop!(:"border_left#{suffix}", left)
     end
   end
 end

@@ -44,9 +44,12 @@ RSpec.describe Flourish::Style do
       expect(result).to eq("\e[1;3mhi\e[0m")
     end
 
-    it "returns self for chaining" do
-      expect(style.bold).to be(style)
-      expect(style.italic).to be(style)
+    it "returns a new Style for chaining (immutable)" do
+      s2 = style.bold
+      expect(s2).to be_a(described_class)
+      expect(s2).not_to be(style)
+      expect(style.bold?).to be false
+      expect(s2.bold?).to be true
     end
   end
 
@@ -95,23 +98,22 @@ RSpec.describe Flourish::Style do
   describe "getters" do
     it "reports bold?" do
       expect(style.bold?).to be false
-      style.bold
-      expect(style.bold?).to be true
+      s = style.bold
+      expect(s.bold?).to be true
     end
 
     it "reports italic?" do
-      style.italic
-      expect(style.italic?).to be true
+      expect(style.italic.italic?).to be true
     end
 
     it "reports foreground_color" do
-      style.foreground("#ff0000")
-      expect(style.foreground_color).to be_a(Flourish::Color::TrueColor)
+      s = style.foreground("#ff0000")
+      expect(s.foreground_color).to be_a(Flourish::Color::TrueColor)
     end
 
     it "reports background_color" do
-      style.background("1")
-      expect(style.background_color).to be_a(Flourish::Color::ANSIColor)
+      s = style.background("1")
+      expect(s.background_color).to be_a(Flourish::Color::ANSIColor)
     end
   end
 
@@ -197,24 +199,24 @@ RSpec.describe Flourish::Style do
     end
 
     it "applies padding with 2 args (vertical, horizontal)" do
-      style.padding(0, 2)
-      expect(style.send(:effective_padding_top)).to eq(0)
-      expect(style.send(:effective_padding_right)).to eq(2)
-      expect(style.send(:effective_padding_bottom)).to eq(0)
-      expect(style.send(:effective_padding_left)).to eq(2)
+      s = style.padding(0, 2)
+      expect(s.send(:effective_padding_top)).to eq(0)
+      expect(s.send(:effective_padding_right)).to eq(2)
+      expect(s.send(:effective_padding_bottom)).to eq(0)
+      expect(s.send(:effective_padding_left)).to eq(2)
     end
 
     it "applies padding with 4 args" do
-      style.padding(1, 2, 3, 4)
-      expect(style.send(:effective_padding_top)).to eq(1)
-      expect(style.send(:effective_padding_right)).to eq(2)
-      expect(style.send(:effective_padding_bottom)).to eq(3)
-      expect(style.send(:effective_padding_left)).to eq(4)
+      s = style.padding(1, 2, 3, 4)
+      expect(s.send(:effective_padding_top)).to eq(1)
+      expect(s.send(:effective_padding_right)).to eq(2)
+      expect(s.send(:effective_padding_bottom)).to eq(3)
+      expect(s.send(:effective_padding_left)).to eq(4)
     end
 
     it "applies individual padding" do
-      style.padding_left(3)
-      expect(style.send(:effective_padding_left)).to eq(3)
+      s = style.padding_left(3)
+      expect(s.send(:effective_padding_left)).to eq(3)
     end
 
     it "adds left/right padding to content" do
@@ -231,25 +233,25 @@ RSpec.describe Flourish::Style do
 
   describe "margin" do
     it "applies uniform margin" do
-      style.margin(1)
-      expect(style.send(:effective_margin_top)).to eq(1)
-      expect(style.send(:effective_margin_right)).to eq(1)
-      expect(style.send(:effective_margin_bottom)).to eq(1)
-      expect(style.send(:effective_margin_left)).to eq(1)
+      s = style.margin(1)
+      expect(s.send(:effective_margin_top)).to eq(1)
+      expect(s.send(:effective_margin_right)).to eq(1)
+      expect(s.send(:effective_margin_bottom)).to eq(1)
+      expect(s.send(:effective_margin_left)).to eq(1)
     end
 
     it "applies margin with 2 args" do
-      style.margin(1, 2)
-      expect(style.send(:effective_margin_top)).to eq(1)
-      expect(style.send(:effective_margin_right)).to eq(2)
+      s = style.margin(1, 2)
+      expect(s.send(:effective_margin_top)).to eq(1)
+      expect(s.send(:effective_margin_right)).to eq(2)
     end
 
     it "applies margin with 4 args" do
-      style.margin(1, 2, 3, 4)
-      expect(style.send(:effective_margin_top)).to eq(1)
-      expect(style.send(:effective_margin_right)).to eq(2)
-      expect(style.send(:effective_margin_bottom)).to eq(3)
-      expect(style.send(:effective_margin_left)).to eq(4)
+      s = style.margin(1, 2, 3, 4)
+      expect(s.send(:effective_margin_top)).to eq(1)
+      expect(s.send(:effective_margin_right)).to eq(2)
+      expect(s.send(:effective_margin_bottom)).to eq(3)
+      expect(s.send(:effective_margin_left)).to eq(4)
     end
 
     it "adds left/right margin" do
@@ -286,26 +288,25 @@ RSpec.describe Flourish::Style do
     end
 
     it "sets border_style separately" do
-      style.border_style(Flourish::Border::ROUNDED)
-      style.border_top
-      style.border_bottom
-      style.border_left
-      style.border_right
-      result = style.render("hi")
+      result = style.border_style(Flourish::Border::ROUNDED)
+                    .border_top
+                    .border_bottom
+                    .border_left
+                    .border_right
+                    .render("hi")
       lines = result.split("\n")
       expect(lines[0]).to include("╭")
     end
 
     it "applies border foreground color" do
-      style.border(Flourish::Border::ASCII).border_foreground("1")
-      result = style.render("hi")
+      result = style.border(Flourish::Border::ASCII).border_foreground("1").render("hi")
       expect(result).to include("\e[31m")
     end
 
     it "applies per-side border foreground" do
-      style.border(Flourish::Border::ASCII)
-      style.border_top_foreground("1")
-      result = style.render("hi")
+      result = style.border(Flourish::Border::ASCII)
+                    .border_top_foreground("1")
+                    .render("hi")
       lines = result.split("\n")
       expect(lines[0]).to include("\e[31m")
     end
@@ -325,9 +326,9 @@ RSpec.describe Flourish::Style do
     end
 
     it "adds only top border" do
-      style.border_style(Flourish::Border::ASCII)
-      style.border_top
-      result = style.render("hi")
+      result = style.border_style(Flourish::Border::ASCII)
+                    .border_top
+                    .render("hi")
       lines = result.split("\n")
       expect(lines.length).to eq(2) # top border + content
     end
@@ -360,9 +361,9 @@ RSpec.describe Flourish::Style do
     end
 
     it "sets align with 2 args" do
-      style.align(0.5, 0.5)
-      expect(style.send(:effective_align_horizontal)).to eq(0.5)
-      expect(style.send(:effective_align_vertical)).to eq(0.5)
+      s = style.align(0.5, 0.5)
+      expect(s.send(:effective_align_horizontal)).to eq(0.5)
+      expect(s.send(:effective_align_vertical)).to eq(0.5)
     end
   end
 
@@ -370,32 +371,32 @@ RSpec.describe Flourish::Style do
     it "inherits unset props from parent" do
       parent = described_class.new.bold.foreground("1")
       child = described_class.new.italic
-      child.inherit(parent)
-      expect(child.bold?).to be true
-      expect(child.italic?).to be true
+      result = child.inherit(parent)
+      expect(result.bold?).to be true
+      expect(result.italic?).to be true
     end
 
     it "does not override set props" do
       parent = described_class.new.foreground("1")
       child = described_class.new.foreground("2")
-      child.inherit(parent)
-      expect(child.foreground_color.code).to eq(2)
+      result = child.inherit(parent)
+      expect(result.foreground_color.code).to eq(2)
     end
   end
 
   describe "#unset" do
     it "removes a prop" do
-      style.bold
-      expect(style.bold?).to be true
-      style.unset(Flourish::Style::BOLD)
-      expect(style.bold?).to be false
+      s = style.bold
+      expect(s.bold?).to be true
+      s2 = s.unset(Flourish::Style::BOLD)
+      expect(s2.bold?).to be false
     end
 
     it "removes multiple props" do
-      style.bold.italic
-      style.unset(Flourish::Style::BOLD, Flourish::Style::ITALIC)
-      expect(style.bold?).to be false
-      expect(style.italic?).to be false
+      s = style.bold.italic
+      s2 = s.unset(Flourish::Style::BOLD, Flourish::Style::ITALIC)
+      expect(s2.bold?).to be false
+      expect(s2.italic?).to be false
     end
   end
 
@@ -405,35 +406,35 @@ RSpec.describe Flourish::Style do
     end
 
     it "returns true for set prop" do
-      style.bold
-      expect(style.set?(Flourish::Style::BOLD)).to be true
+      s = style.bold
+      expect(s.set?(Flourish::Style::BOLD)).to be true
     end
   end
 
   describe "#copy" do
     it "creates an independent copy" do
-      style.bold.foreground("1")
-      copy = style.copy
-      copy.italic
-      expect(style.italic?).to be false
-      expect(copy.bold?).to be true
+      s = described_class.new.bold.foreground("1")
+      copy = s.copy
+      copy_italic = copy.italic
+      expect(s.italic?).to be false
+      expect(copy.italic?).to be false
+      expect(copy_italic.italic?).to be true
+      expect(copy_italic.bold?).to be true
     end
   end
 
   describe "whitespace options" do
     it "supports underline_spaces" do
-      style.underline_spaces
-      expect(style.underline_spaces?).to be true
+      expect(style.underline_spaces.underline_spaces?).to be true
     end
 
     it "supports strikethrough_spaces" do
-      style.strikethrough_spaces
-      expect(style.strikethrough_spaces?).to be true
+      expect(style.strikethrough_spaces.strikethrough_spaces?).to be true
     end
 
     it "supports color_whitespace" do
-      style.color_whitespace.background("1")
-      expect(style.color_whitespace?).to be true
+      s = style.color_whitespace.background("1")
+      expect(s.color_whitespace?).to be true
     end
 
     it "applies bg color to padding whitespace when color_whitespace is set" do
@@ -473,15 +474,14 @@ RSpec.describe Flourish::Style do
 
   describe "border_background" do
     it "applies background to all border sides" do
-      style.border(Flourish::Border::ASCII).border_background("4")
-      result = style.render("hi")
+      result = style.border(Flourish::Border::ASCII).border_background("4").render("hi")
       expect(result).to include("\e[44m")
     end
 
     it "applies per-side background" do
-      style.border(Flourish::Border::ASCII)
-      style.border_top_background("1")
-      result = style.render("hi")
+      result = style.border(Flourish::Border::ASCII)
+                    .border_top_background("1")
+                    .render("hi")
       lines = result.split("\n")
       expect(lines[0]).to include("\e[41m")
     end
@@ -489,15 +489,13 @@ RSpec.describe Flourish::Style do
 
   describe "border foreground CSS shorthand" do
     it "applies 1 color to all sides" do
-      style.border(Flourish::Border::ASCII).border_foreground("1")
-      result = style.render("hi")
+      result = style.border(Flourish::Border::ASCII).border_foreground("1").render("hi")
       lines = result.split("\n")
       lines.each { |l| expect(l).to include("\e[31m") }
     end
 
     it "applies 2 colors (vertical, horizontal)" do
-      style.border(Flourish::Border::ASCII).border_foreground("1", "2")
-      result = style.render("hi")
+      result = style.border(Flourish::Border::ASCII).border_foreground("1", "2").render("hi")
       # Top uses color "1", sides use color "2"
       lines = result.split("\n")
       expect(lines[0]).to include("\e[31m") # top
@@ -507,21 +505,21 @@ RSpec.describe Flourish::Style do
 
   describe "padding CSS shorthand" do
     it "applies 3 args (top, horizontal, bottom)" do
-      style.padding(1, 2, 3)
-      expect(style.send(:effective_padding_top)).to eq(1)
-      expect(style.send(:effective_padding_right)).to eq(2)
-      expect(style.send(:effective_padding_bottom)).to eq(3)
-      expect(style.send(:effective_padding_left)).to eq(2)
+      s = style.padding(1, 2, 3)
+      expect(s.send(:effective_padding_top)).to eq(1)
+      expect(s.send(:effective_padding_right)).to eq(2)
+      expect(s.send(:effective_padding_bottom)).to eq(3)
+      expect(s.send(:effective_padding_left)).to eq(2)
     end
   end
 
   describe "margin CSS shorthand" do
     it "applies 3 args (top, horizontal, bottom)" do
-      style.margin(1, 2, 3)
-      expect(style.send(:effective_margin_top)).to eq(1)
-      expect(style.send(:effective_margin_right)).to eq(2)
-      expect(style.send(:effective_margin_bottom)).to eq(3)
-      expect(style.send(:effective_margin_left)).to eq(2)
+      s = style.margin(1, 2, 3)
+      expect(s.send(:effective_margin_top)).to eq(1)
+      expect(s.send(:effective_margin_right)).to eq(2)
+      expect(s.send(:effective_margin_bottom)).to eq(3)
+      expect(s.send(:effective_margin_left)).to eq(2)
     end
   end
 
@@ -559,16 +557,15 @@ RSpec.describe Flourish::Style do
 
   describe "inline mode" do
     it "can be set and queried" do
-      style.inline
-      expect(style.inline?).to be true
+      expect(style.inline.inline?).to be true
     end
   end
 
   describe "multiple renders with same style" do
     it "produces consistent results" do
-      style.bold.foreground("1").width(10)
-      r1 = style.render("test")
-      r2 = style.render("test")
+      s = described_class.new.bold.foreground("1").width(10)
+      r1 = s.render("test")
+      r2 = s.render("test")
       expect(r1).to eq(r2)
     end
   end
@@ -588,18 +585,17 @@ RSpec.describe Flourish::Style do
 
   describe "border only on some sides" do
     it "renders with only left border" do
-      style.border_style(Flourish::Border::ASCII).border_left
-      result = style.render("hi")
+      result = style.border_style(Flourish::Border::ASCII).border_left.render("hi")
       lines = result.split("\n")
       expect(lines[0]).to start_with("|")
       expect(lines.length).to eq(1)
     end
 
     it "renders with top and bottom only" do
-      style.border_style(Flourish::Border::ASCII)
-      style.border_top
-      style.border_bottom
-      result = style.render("hi")
+      result = style.border_style(Flourish::Border::ASCII)
+                    .border_top
+                    .border_bottom
+                    .render("hi")
       lines = result.split("\n")
       expect(lines.length).to eq(3)
       expect(lines[0]).to include("-")
@@ -663,31 +659,52 @@ RSpec.describe Flourish::Style do
     end
   end
 
-  describe "chaining returns self" do
-    it "returns self for all setters" do
+  describe "immutable chaining" do
+    it "returns a new Style for all setters" do
       s = described_class.new
-      expect(s.bold).to be(s)
-      expect(s.italic).to be(s)
-      expect(s.faint).to be(s)
-      expect(s.blink).to be(s)
-      expect(s.strikethrough).to be(s)
-      expect(s.underline).to be(s)
-      expect(s.reverse).to be(s)
-      expect(s.foreground("1")).to be(s)
-      expect(s.background("1")).to be(s)
-      expect(s.width(10)).to be(s)
-      expect(s.height(5)).to be(s)
-      expect(s.max_width(20)).to be(s)
-      expect(s.max_height(10)).to be(s)
-      expect(s.padding(1)).to be(s)
-      expect(s.margin(1)).to be(s)
-      expect(s.border(Flourish::Border::ASCII)).to be(s)
-      expect(s.align(0.5)).to be(s)
-      expect(s.tab_width(2)).to be(s)
-      expect(s.inline).to be(s)
-      expect(s.underline_spaces).to be(s)
-      expect(s.strikethrough_spaces).to be(s)
-      expect(s.color_whitespace).to be(s)
+      expect(s.bold).not_to be(s)
+      expect(s.italic).not_to be(s)
+      expect(s.faint).not_to be(s)
+      expect(s.blink).not_to be(s)
+      expect(s.strikethrough).not_to be(s)
+      expect(s.underline).not_to be(s)
+      expect(s.reverse).not_to be(s)
+      expect(s.foreground("1")).not_to be(s)
+      expect(s.background("1")).not_to be(s)
+      expect(s.width(10)).not_to be(s)
+      expect(s.height(5)).not_to be(s)
+      expect(s.max_width(20)).not_to be(s)
+      expect(s.max_height(10)).not_to be(s)
+      expect(s.padding(1)).not_to be(s)
+      expect(s.margin(1)).not_to be(s)
+      expect(s.border(Flourish::Border::ASCII)).not_to be(s)
+      expect(s.align(0.5)).not_to be(s)
+      expect(s.tab_width(2)).not_to be(s)
+      expect(s.inline).not_to be(s)
+      expect(s.underline_spaces).not_to be(s)
+      expect(s.strikethrough_spaces).not_to be(s)
+      expect(s.color_whitespace).not_to be(s)
+    end
+
+    it "does not mutate the original" do
+      s = described_class.new
+      s.bold
+      expect(s.bold?).to be false
+
+      s.foreground("1")
+      expect(s.foreground_color).to be_nil
+
+      s.width(10)
+      expect(s.send(:effective_width)).to eq(0)
+    end
+
+    it "all setters return a Style" do
+      s = described_class.new
+      expect(s.bold).to be_a(described_class)
+      expect(s.padding(1)).to be_a(described_class)
+      expect(s.margin(1)).to be_a(described_class)
+      expect(s.border(Flourish::Border::ASCII)).to be_a(described_class)
+      expect(s.align(0.5)).to be_a(described_class)
     end
   end
 
