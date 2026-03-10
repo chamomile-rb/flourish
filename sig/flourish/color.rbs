@@ -1,0 +1,29 @@
+module Flourish
+  module Color
+    def self.parse: (String? color) -> untyped
+
+    class NoColor
+      def no_color?: () -> true
+      def fg_sequence: () -> String
+      def bg_sequence: () -> String
+    end
+
+    class ANSIColor
+      def no_color?: () -> false
+      def fg_sequence: () -> String
+      def bg_sequence: () -> String
+    end
+
+    class ANSI256Color
+      def no_color?: () -> false
+      def fg_sequence: () -> String
+      def bg_sequence: () -> String
+    end
+
+    class TrueColor
+      def no_color?: () -> false
+      def fg_sequence: () -> String
+      def bg_sequence: () -> String
+    end
+  end
+end

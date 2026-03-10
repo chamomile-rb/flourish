@@ -3,9 +3,9 @@
 require_relative "lib/flourish/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "flourish"
+  spec.name          = "chamomile-flourish"
   spec.version       = Flourish::VERSION
-  spec.authors       = ["Chamomile Contributors"]
+  spec.authors       = ["Jack Killilea"]
   spec.summary       = "Terminal styling library for Ruby"
   spec.description   = "CSS-like box model styling for terminal output — colors, padding, margins, borders, alignment"
   spec.license       = "MIT"

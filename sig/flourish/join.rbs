@@ -1,0 +1,6 @@
+module Flourish
+  module Join
+    def self.horizontal: (*String strs) -> String
+    def self.vertical: (*String strs) -> String
+  end
+end

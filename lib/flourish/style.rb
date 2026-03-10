@@ -234,6 +234,20 @@ module Flourish
       dup
     end
 
+    # Merge another style on top of this one. The other style's set properties win.
+    def merge(other)
+      return dup if other.nil?
+
+      copy = dup
+      other.set_props.each do |prop|
+        copy.set_prop!(prop, other.instance_variable_get(:"@#{prop}"))
+      end
+      copy
+    end
+
+    # Empty style singleton
+    EMPTY = new.freeze
+
     # --- Render ---
 
     def render(*strs)

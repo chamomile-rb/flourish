@@ -1,0 +1,8 @@
+module Flourish
+  module ANSI
+    def self.strip: (String str) -> String
+    def self.printable_width: (String str) -> Integer
+    def self.height: (String str) -> Integer
+    def self.size: (String str) -> [Integer, Integer]
+  end
+end

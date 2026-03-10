@@ -744,4 +744,47 @@ RSpec.describe Flourish::Style do
       expect(s.color_whitespace?).to be false
     end
   end
+
+  describe "#merge" do
+    it "merges another style's set properties on top" do
+      base = described_class.new.foreground("#ff0000").bold
+      overlay = described_class.new.foreground("#00ff00").italic
+
+      merged = base.merge(overlay)
+
+      expect(merged.bold?).to be true
+      expect(merged.italic?).to be true
+      # Overlay's foreground wins
+      result = merged.render("hi")
+      expect(result).to include("\e[")
+      expect(result).to include(";3;") # italic SGR code
+    end
+
+    it "returns a copy when other is nil" do
+      base = described_class.new.bold
+      merged = base.merge(nil)
+      expect(merged.bold?).to be true
+      expect(merged).not_to equal(base)
+    end
+
+    it "does not modify the original style" do
+      base = described_class.new.bold
+      overlay = described_class.new.italic
+      base.merge(overlay)
+      expect(base.italic?).to be false
+    end
+  end
+
+  describe "EMPTY" do
+    it "provides an empty frozen style" do
+      empty = described_class::EMPTY
+      expect(empty).to be_frozen
+      expect(empty.bold?).to be false
+    end
+
+    it "can be used as a base for building styles" do
+      s = described_class::EMPTY.bold
+      expect(s.bold?).to be true
+    end
+  end
 end
