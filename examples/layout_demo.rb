@@ -9,7 +9,7 @@ title_style = Flourish::Style.new
                              .foreground("#fafafa")
                              .background("#7d56f4")
                              .padding(0, 2)
-                             .align_horizontal(Flourish::CENTER)
+                             .align_horizontal(:center)
 
 info_style = Flourish::Style.new
                             .border(Flourish::Border::ROUNDED)
@@ -34,7 +34,7 @@ box2 = info_style.copy
 footer = subtle_style.render("Part of the Chamomile ecosystem")
 
 # Layout
-boxes = Flourish.join_horizontal(Flourish::TOP, box1, "  ", box2)
-output = Flourish.join_vertical(Flourish::CENTER, title, "", boxes, "", footer)
+boxes = Flourish.horizontal([box1, "  ", box2], align: :top)
+output = Flourish.vertical([title, "", boxes, "", footer], align: :center)
 
 puts output

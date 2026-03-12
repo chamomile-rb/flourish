@@ -170,13 +170,13 @@ module Flourish
 
     def align(*positions)
       copy = dup
-      copy.set_prop!(:align_horizontal, positions[0]) if positions.length >= 1
-      copy.set_prop!(:align_vertical, positions[1]) if positions.length >= 2
+      copy.set_prop!(:align_horizontal, Flourish.resolve_position(positions[0])) if positions.length >= 1
+      copy.set_prop!(:align_vertical, Flourish.resolve_position(positions[1])) if positions.length >= 2
       copy
     end
 
-    def align_horizontal(pos) = assign_prop(:align_horizontal, pos)
-    def align_vertical(pos) = assign_prop(:align_vertical, pos)
+    def align_horizontal(pos) = assign_prop(:align_horizontal, Flourish.resolve_position(pos))
+    def align_vertical(pos) = assign_prop(:align_vertical, Flourish.resolve_position(pos))
 
     # --- Whitespace options ---
 
