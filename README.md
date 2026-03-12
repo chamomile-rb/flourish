@@ -1,6 +1,6 @@
 # Flourish
 
-Terminal styling library for Ruby. CSS-like box model with colors, borders, padding, alignment, and layout composition. Inspired by Go's [Lip Gloss](https://github.com/charmbracelet/lipgloss).
+Terminal styling library for Ruby. CSS-like box model with colors, borders, padding, alignment, and layout composition.
 
 Part of the [Chamomile](https://github.com/chamomile-rb/chamomile) ecosystem. Zero runtime dependencies.
 
@@ -93,23 +93,26 @@ Flourish::Style.new.padding(1, 2).margin(0, 1).render("spaced")
 ### Alignment
 
 ```ruby
-Flourish::Style.new.width(40).align_horizontal(Flourish::CENTER).render("centered")
-Flourish::Style.new.height(10).align_vertical(Flourish::CENTER).render("vertically centered")
+Flourish::Style.new.width(40).align_horizontal(:center).render("centered")
+Flourish::Style.new.height(10).align_vertical(:center).render("vertically centered")
 
-# Position constants: LEFT/TOP = 0.0, CENTER = 0.5, RIGHT/BOTTOM = 1.0
+# Position symbols: :left/:top, :center, :right/:bottom
 ```
 
 ### Layout Composition
 
 ```ruby
 # Side by side
-Flourish.join_horizontal(Flourish::TOP, box_a, box_b, box_c)
+Flourish.horizontal([box_a, box_b, box_c], align: :top)
 
 # Stacked
-Flourish.join_vertical(Flourish::LEFT, header, body, footer)
+Flourish.vertical([header, body, footer], align: :left)
+
+# Block form
+Flourish.horizontal(align: :top) { [box_a, box_b, box_c] }
 
 # Place content in a fixed-size box
-Flourish.place(80, 24, Flourish::CENTER, Flourish::CENTER, content)
+Flourish.place(content, width: 80, height: 24, align: :center, valign: :center)
 ```
 
 ### Style Inheritance & Copy
@@ -140,25 +143,15 @@ color = profile.color("#ff0000")          # downsamples if needed (TrueColor -> 
 ```sh
 ruby examples/kitchen_sink.rb            # comprehensive feature showcase (21 features)
 ruby examples/layout_demo.rb             # styled box composition
-ruby examples/layout_demo_interactive.rb # lazygit-style multi-panel UI (requires chamomile + petals)
+ruby examples/layout_demo_interactive.rb # multi-panel UI (requires chamomile + petals)
 ruby examples/smoke_test.rb              # headless test of all features
 ```
-
-### Interactive Layout Demo
-
-The `layout_demo_interactive.rb` example combines all three gems to create a Lazygit-style multi-panel interface:
-
-- 5 stacked left panels + 1 large detail panel
-- Tab/Shift+Tab to cycle focus between panels
-- j/k to scroll within panels
-- Context-sensitive detail pane with fake diffs
-- Terminal resize support
 
 ## Ecosystem
 
 | Gem | Description |
 |-----|-------------|
-| **[chamomile](https://github.com/chamomile-rb/chamomile)** | Core TUI framework (Elm Architecture event loop) |
+| **[chamomile](https://github.com/chamomile-rb/chamomile)** | Core TUI framework (event-driven event loop) |
 | **[petals](https://github.com/chamomile-rb/petals)** | Reusable TUI components — Spinner, TextInput, Viewport, Table, List, and more |
 | **flourish** | Terminal styling (this gem) |
 

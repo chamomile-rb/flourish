@@ -132,16 +132,16 @@ end
 # --- Join horizontal ---
 a = Flourish::Style.new.border(Flourish::Border::ASCII).render("A")
 b = Flourish::Style.new.border(Flourish::Border::ASCII).render("B")
-joined = Flourish.join_horizontal(Flourish::TOP, a, b)
+joined = Flourish.horizontal([a, b], align: :top)
 assert("Join horizontal") { joined.split("\n").length == 3 }
 
 # --- Join vertical ---
-joined = Flourish.join_vertical(Flourish::LEFT, "aaa", "b")
+joined = Flourish.vertical(["aaa", "b"], align: :left)
 lines = joined.split("\n")
 assert("Join vertical aligns") { Flourish.width(lines[0]) == Flourish.width(lines[1]) }
 
 # --- Place ---
-placed = Flourish.place(20, 5, Flourish::CENTER, Flourish::CENTER, "hi")
+placed = Flourish.place("hi", width: 20, height: 5, align: :center, valign: :center)
 lines = placed.split("\n")
 assert("Place center") { lines.length == 5 && lines[2].include?("hi") }
 
@@ -153,6 +153,10 @@ assert("Flourish.size") { Flourish.size("hi\nhello") == [5, 2] }
 # --- Position constants ---
 assert("Position constants") do
   [Flourish::TOP, Flourish::LEFT, Flourish::CENTER, Flourish::BOTTOM, Flourish::RIGHT].all?(Numeric)
+end
+
+assert("Symbol positions resolve to Numeric") do
+  [:top, :left, :center, :bottom, :right].all? { |s| Flourish.resolve_position(s).is_a?(Numeric) }
 end
 
 # --- Results ---

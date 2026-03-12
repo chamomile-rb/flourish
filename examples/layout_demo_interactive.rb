@@ -14,8 +14,7 @@ require_relative "../lib/flourish"
 require "chamomile"
 
 class LayoutDemo
-  include Chamomile::Model
-  include Chamomile::Commands
+  include Chamomile::Application
 
   PANELS = %i[status files branches commits stash main].freeze
 
@@ -56,11 +55,11 @@ class LayoutDemo
 
   def update(msg)
     case msg
-    when Chamomile::WindowSizeMsg
+    when Chamomile::ResizeEvent
       @width  = msg.width
       @height = msg.height
 
-    when Chamomile::KeyMsg
+    when Chamomile::KeyEvent
       case msg.key
       when "q"
         return quit
@@ -92,10 +91,10 @@ class LayoutDemo
     left_panels = render_left_column(left_w, body_h)
     right_panel = render_panel(:main, right_w, body_h)
 
-    layout = Flourish.join_horizontal(Flourish::TOP, left_panels, right_panel)
+    layout = Flourish.horizontal([left_panels, right_panel], align: :top)
     bar    = status_bar(@width)
 
-    Flourish.join_vertical(Flourish::LEFT, layout, bar)
+    Flourish.vertical([layout, bar], align: :left)
   end
 
   private
@@ -109,7 +108,7 @@ class LayoutDemo
       render_panel(key, col_width, inner_heights[i])
     end
 
-    Flourish.join_vertical(Flourish::LEFT, *panels)
+    Flourish.vertical(panels, align: :left)
   end
 
   def distribute_heights(total, count)

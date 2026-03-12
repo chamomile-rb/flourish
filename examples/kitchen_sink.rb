@@ -12,7 +12,7 @@ def section(title)
                          .background("#7d56f4")
                          .padding(0, 2)
                          .width(72)
-                         .align_horizontal(Flourish::CENTER)
+                         .align_horizontal(:center)
   puts "\n#{style.render(title)}\n"
 end
 
@@ -183,10 +183,10 @@ border_presets.each_slice(5) do |group|
     Flourish::Style.new
                    .border(preset)
                    .width(14)
-                   .align_horizontal(Flourish::CENTER)
+                   .align_horizontal(:center)
                    .render(name)
   end
-  puts Flourish.join_horizontal(Flourish::TOP, *boxes)
+  puts Flourish.horizontal(boxes, align: :top)
 end
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -199,7 +199,7 @@ colored_border = Flourish::Style.new
                                 .border_foreground("#ff0000", "#00ff00", "#0000ff", "#ffff00")
                                 .padding(1, 2)
                                 .width(40)
-                                .align_horizontal(Flourish::CENTER)
+                                .align_horizontal(:center)
                                 .render("4 border colors!\nTop=Red Right=Green\nBottom=Blue Left=Yellow")
 puts colored_border
 
@@ -220,7 +220,7 @@ top_bottom = Flourish::Style.new
                             .border(Flourish::Border::NORMAL, true, false, true, false)
                             .border_foreground("#ff7698")
                             .width(30)
-                            .align_horizontal(Flourish::CENTER)
+                            .align_horizontal(:center)
                             .render("Top & Bottom only")
 
 left_only = Flourish::Style.new
@@ -231,7 +231,7 @@ left_only = Flourish::Style.new
                            .border_foreground("#04b575")
                            .render("Left border only")
 
-puts Flourish.join_horizontal(Flourish::TOP, top_bottom, "  ", left_only)
+puts Flourish.horizontal([top_bottom, "  ", left_only], align: :top)
 
 # ═══════════════════════════════════════════════════════════════════════
 #  11. ALIGNMENT
@@ -245,18 +245,18 @@ align_box = Flourish::Style.new
                            .border_foreground("#888888")
 
 left = align_box.copy
-                .align_horizontal(Flourish::LEFT)
+                .align_horizontal(:left)
                 .render("Left")
 
 center = align_box.copy
-                  .align_horizontal(Flourish::CENTER)
+                  .align_horizontal(:center)
                   .render("Center")
 
 right = align_box.copy
-                 .align_horizontal(Flourish::RIGHT)
+                 .align_horizontal(:right)
                  .render("Right")
 
-puts Flourish.join_horizontal(Flourish::TOP, left, center, right)
+puts Flourish.horizontal([left, center, right], align: :top)
 
 puts ""
 
@@ -265,8 +265,8 @@ vtop = Flourish::Style.new
                       .height(7)
                       .border(Flourish::Border::ROUNDED)
                       .border_foreground("#888888")
-                      .align_vertical(Flourish::TOP)
-                      .align_horizontal(Flourish::CENTER)
+                      .align_vertical(:top)
+                      .align_horizontal(:center)
                       .render("Top")
 
 vcenter = Flourish::Style.new
@@ -274,8 +274,8 @@ vcenter = Flourish::Style.new
                          .height(7)
                          .border(Flourish::Border::ROUNDED)
                          .border_foreground("#888888")
-                         .align_vertical(Flourish::CENTER)
-                         .align_horizontal(Flourish::CENTER)
+                         .align_vertical(:center)
+                         .align_horizontal(:center)
                          .render("Center")
 
 vbot = Flourish::Style.new
@@ -283,11 +283,11 @@ vbot = Flourish::Style.new
                       .height(7)
                       .border(Flourish::Border::ROUNDED)
                       .border_foreground("#888888")
-                      .align_vertical(Flourish::BOTTOM)
-                      .align_horizontal(Flourish::CENTER)
+                      .align_vertical(:bottom)
+                      .align_horizontal(:center)
                       .render("Bottom")
 
-puts Flourish.join_horizontal(Flourish::TOP, vtop, vcenter, vbot)
+puts Flourish.horizontal([vtop, vcenter, vbot], align: :top)
 
 # ═══════════════════════════════════════════════════════════════════════
 #  12. TRANSFORM
@@ -354,7 +354,7 @@ tab8 = Flourish::Style.new
                       .border_foreground("#666666")
                       .render("tab=8:\n\tindented\n\t\tdouble")
 
-puts Flourish.join_horizontal(Flourish::TOP, tab2, " ", tab4, " ", tab8)
+puts Flourish.horizontal([tab2, " ", tab4, " ", tab8], align: :top)
 
 # ═══════════════════════════════════════════════════════════════════════
 #  15. WHITESPACE OPTIONS
@@ -409,7 +409,7 @@ box_c = box_style.copy
                  .render("Box C\nYellow")
 
 puts "  Top-aligned:"
-puts Flourish.join_horizontal(Flourish::TOP, box_a, box_b, box_c)
+puts Flourish.horizontal([box_a, box_b, box_c], align: :top)
 
 # ═══════════════════════════════════════════════════════════════════════
 #  17. JOIN VERTICAL
@@ -422,7 +422,7 @@ header = Flourish::Style.new
                         .background("#7d56f4")
                         .width(50)
                         .padding(0, 2)
-                        .align_horizontal(Flourish::CENTER)
+                        .align_horizontal(:center)
                         .render("Header")
 
 body = Flourish::Style.new
@@ -436,23 +436,23 @@ footer = Flourish::Style.new
                         .foreground("#666666")
                         .italic
                         .width(50)
-                        .align_horizontal(Flourish::RIGHT)
+                        .align_horizontal(:right)
                         .render("Footer — right aligned")
 
-puts Flourish.join_vertical(Flourish::CENTER, header, body, footer)
+puts Flourish.vertical([header, body, footer], align: :center)
 
 # ═══════════════════════════════════════════════════════════════════════
 #  18. PLACE
 # ═══════════════════════════════════════════════════════════════════════
 section("18. Place")
 
-placed = Flourish.place(40, 5, Flourish::CENTER, Flourish::CENTER, "Centered in 40x5")
+placed = Flourish.place("Centered in 40x5", width: 40, height: 5, align: :center, valign: :center)
 puts Flourish::Style.new
                     .border(Flourish::Border::ROUNDED)
                     .border_foreground("#555555")
                     .render(placed)
 
-h_placed = Flourish.place_horizontal(50, Flourish::RIGHT, "Right-placed text")
+h_placed = Flourish.place_horizontal(50, :right, "Right-placed text")
 puts Flourish::Style.new
                     .border(Flourish::Border::HIDDEN)
                     .render(h_placed)
@@ -506,7 +506,7 @@ title_bar = Flourish::Style.new
                            .background("#7d56f4")
                            .width(72)
                            .padding(0, 2)
-                           .align_horizontal(Flourish::CENTER)
+                           .align_horizontal(:center)
                            .render("Flourish Kitchen Sink")
 
 # Status bar
@@ -520,8 +520,8 @@ status_bar = Flourish::Style.new
                             )
 
 # Compose the layout
-content = Flourish.join_horizontal(Flourish::TOP, sidebar, " ", main)
-layout = Flourish.join_vertical(Flourish::LEFT, title_bar, content, status_bar)
+content = Flourish.horizontal([sidebar, " ", main], align: :top)
+layout = Flourish.vertical([title_bar, content, status_bar], align: :left)
 
 puts layout
 
@@ -549,6 +549,6 @@ done = Flourish::Style.new
                       .border(Flourish::Border::DOUBLE)
                       .border_foreground("#04b575")
                       .width(72)
-                      .align_horizontal(Flourish::CENTER)
+                      .align_horizontal(:center)
                       .render("Kitchen Sink Complete! All 21 features showcased.")
 puts done
