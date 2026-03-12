@@ -359,8 +359,8 @@ module Flourish
     def effective_margin_bottom = @margin_bottom || 0
     def effective_margin_left = @margin_left || 0
     def effective_border_style = @border_style
-    def effective_align_horizontal = @align_horizontal || Flourish::LEFT
-    def effective_align_vertical = @align_vertical || Flourish::TOP
+    def effective_align_horizontal = @align_horizontal || 0.0
+    def effective_align_vertical = @align_vertical || 0.0
 
     def compute_content_width
       w = effective_width

@@ -97,7 +97,7 @@ module Flourish
       when Numeric
         val.to_f
       else
-        val.to_f
+        raise ArgumentError, "Expected a Symbol or Numeric position, got #{val.inspect}"
       end
     end
   end
