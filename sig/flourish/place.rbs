@@ -1,5 +1,0 @@
-module Flourish
-  module Place
-    def self.place: (Integer width, Integer height, Float h_pos, Float v_pos, String content, ?bg: String?) -> String
-  end
-end

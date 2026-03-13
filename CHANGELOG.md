@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0] - 2026-03-12
+
+### Changed
+
+- **DEPRECATED**: This gem is now a shim that depends on `chamomile ~> 1.0`. All styling has been merged into the main Chamomile gem. Replace `gem "flourish"` with `gem "chamomile"` and change `Flourish::` to `Chamomile::`.
+
 ## [Unreleased]
 
 ### Added
